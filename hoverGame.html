@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>James Blair</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom fonts for this template -->
+  <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Varela+Round" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link href="css/grayscale.min.css" rel="stylesheet">
+
+</head>
+
+<body id="page-top">
+
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
+    <div class="container">
+      <a class="navbar-brand js-scroll-trigger" href="#page-top"><!--Start Bootstrap--></a>
+      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        Menu
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Home</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+<style>
+canvas {
+    border: 1px solid #d3d3d3;
+    background-color: #000000;
+}
+    
+body {
+    color: white;
+    text-align: center;
+    align-content: center;
+    background-color: #000000;
+    margin-top: 250px;
+}
+
+
+</style>
+<body onload="startGame()">
+<script>
+
+var walls = []; //establishing array variables from the spawning walls and the gaps between them
+var gaps = [];
+    
+var gameStarted = false;
+
+
+function startGame() {
+    myGameArea.menu(); //starts the menu function
+    player = new item(30, 30, "red", 60, 120); //creates my player as an "item" passing on properties
+}
+    
+var myGameArea = {
+  canvas : document.createElement("canvas"),
+    
+  start : function() {
+    this.interval = setInterval(updateGameArea, 15);
+  },
+  clear : function() {
+    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  },
+  gameOver : function() {
+    clearInterval(this.interval);
+    window.alert("GAME OVER! refresh the page to try again");
+    
+  },
+  menu : function() {
+    //this function contains the canvas and a button with a click event to start the game
+    this.canvas.width = 950;
+    this.canvas.height = 500;
+    this.context = this.canvas.getContext("2d");
+    document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+      
+    this.frameNo = 0; //this is kept to call events to start when game begins
+      
+    this.context.font = "80px Courier";
+    this.context.fillStyle = 'green';
+    this.context.fillText("HOVER GAME", 250, 200);
+    
+    var buttonX = 350;
+    var buttonY = 300;
+    var buttonW = 250;
+    var buttonH = 150;
+    
+    this.context.fillStyle = 'red';
+    this.context.fillRect(buttonX, buttonY, buttonW, buttonH);
+    this.context.fillStyle = 'black';
+    this.context.fillRect(buttonX+5, buttonY+5, buttonW-10, buttonH-10);
+    this.context.fillStyle = 'red';
+    this.context.font = "36px Courier";
+    this.context.fillText("Start Game", buttonX+17, buttonY+85);
+    this.canvas.addEventListener('click', function(event) {
+    if (
+        gameStarted === false &&
+        event.x >= 350 + this.offsetLeft &&            //clickable area for button
+        event.x <= 600 + this.offsetLeft &&
+        event.y >= 300 + this.offsetTop && 
+        event.y <= 450 + this.offsetTop
+      ) {
+        gameStarted = true; //to stop the game from being repeatedly started from outside the menu
+        myGameArea.start(); //starts the game
+      }
+    });
+  }
+}
+    
+var canvasWidth = myGameArea.canvas.width; //variables to refer to canvas size
+var canvasHieght = myGameArea.canvas.hieght;
+    
+addEventListener( "keydown", doKeyDown, true); //event listeners for key presses
+addEventListener( "keyup", doKeyUp, true);
+window.addEventListener('keydown', function(e) {
+  if(e.keyCode == 32 && e.target == document.body) {
+    e.preventDefault();
+  }
+});
+
+    
+function wall(width, height, color, x, y) { //wall properties
+  this.width = width;
+  this.height = height;
+  this.x = x;
+  this.y = y; 
+  this.update = function(){ //internal update function to animate every frame in game
+    ctx = myGameArea.context;
+    ctx.fillStyle = color;
+    ctx.fillRect(this.x, this.y, this.width, this.height);
+  }
+}
+
+function gap(width, height, color, x, y) { //gap proerties (this is same as wall but I required a seperate instance to refer to it seperately)
+  this.width = width;
+  this.height = height;
+  this.x = x;
+  this.y = y; 
+  this.update = function(){
+    ctx = myGameArea.context;
+    ctx.fillStyle = color;
+    ctx.fillRect(this.x, this.y, this.width, this.height);
+  }
+}
+    
+function item(width, height, color, x, y) { //player, variables, properties and functions
+  this.width = width;
+  this.height = height;
+  this.x = x;
+  this.y = y; 
+  this.speedX = 0; //unused speed varible for horizontal movement in final game
+  this.speedY = 0; 
+  this.gravity = 0.25;
+  this.gravitySpeed = 0;
+  this.bounce = 0.6;
+  this.update = function(){
+    ctx = myGameArea.context;
+    ctx.fillStyle = color;
+    ctx.fillRect(this.x, this.y, this.width, this.height);
+  }
+    this.move = function() {
+    this.gravitySpeed += this.gravity;
+    this.x += this.speedX; //unused horizontal movement
+    this.y += this.speedY + this.gravitySpeed;
+    if(this.y > 470){
+        this.y =  470;  // canvas size minus player size
+        this.gravitySpeed = -(this.gravitySpeed * this.bounce); //allows bounce intenisty based on fall speed
+    }
+    if(this.y < 30){
+        this.y =  30;
+  }
+    }
+  this.collide = function(object) { //collision detection function
+    //an object is passed as a parameter
+    //this will only work with rectangular objects as it does not account for complex geometry
+    var myleft = this.x;
+    var myright = this.x + (this.width);
+    var mytop = this.y;
+    var mybottom = this.y + (this.height);
+    var otherleft = object.x;
+    var otherright = object.x + (object.width);
+    var othertop = object.y;
+    var otherbottom = object.y + (object.height);
+    var collision = true;
+    if ((mybottom < othertop) || //checking for overlap
+    (mytop > otherbottom) ||
+    (myright < otherleft) ||
+    (myleft > otherright)) {
+      collision = false;
+    }
+    return collision; //returns boolean
+  }
+}
+
+function time(n) {
+  if ((myGameArea.frameNo / n) % 1 == 0) { //this is a simple timer based on framerate
+      //it takes the modulus to ensure whole numbers
+      return true;
+  }
+  return false;
+}
+
+function accelerate(n) { //function to modify the gravity for realistic feeling thrust
+    player.gravity = n;
+}
+
+var wallSpeed = 2; //variables that required initializing are outside update function
+var spawnRate = 60;
+var gapSize = 300;
+var level = -1;
+var score = 0;
+    
+function updateGameArea() { //called repeatedly
+
+var x; //variables for wall sizing, positioning
+var minHeight = 30;
+var maxHeight = 220;
+var height;
+    
+if (time(500)) { //calls increases/decreases to variables every 5 seconds. This makes the game faster and harder over time.
+    wallSpeed +=2;
+    spawnRate -=4;
+    level+=1;
+    gapSize -= 5;
+    document.getElementById("level").innerHTML = level;
+}
+if (time(10)){ //updates the score every tenth of a second
+    score++
+    document.getElementById("score").innerHTML = score;
+}
+
+    
+for (i = 0; i < walls.length; i += 1) { //each wall in the array is checked for collision with the player
+    if (player.collide(walls[i])) {
+        ctx = myGameArea.context;
+        myGameArea.gameOver();
+    }
+}
+    
+myGameArea.clear();
+myGameArea.frameNo += 1; //tracks frame
+            
+if (myGameArea.frameNo == 1 || time(spawnRate)) { //spawns 2 sets of walls on top and bottom of canvas
+    x = myGameArea.canvas.width;
+    height = Math.floor(Math.random()*(maxHeight-minHeight)+minHeight);//random number between range
+    walls.push(new wall(100, height, "green", x, 0)); //new items are added to the array
+    gaps.push(new gap(100, gapSize, "black", x, height)); // the gaps are not checked for collision
+    walls.push(new wall(100,  500, "green", x, height+gapSize));
+    }
+
+for (i = 0; i < walls.length; i += 1) {
+        walls[i].x -= wallSpeed;
+        walls[i].update(); //loops through array to update walls
+}
+    
+for (i = 0; i < gaps.length; i += 1) {
+        gaps[i].x -= wallSpeed;
+        gaps[i].update();
+}
+      
+player.move(); //enables player transformation and updates
+player.update();
+
+    
+}
+
+function doKeyUp(e){
+
+			if (e.keyCode == 32) { //checks for spacebar input release
+				accelerate(0.15); //increase thrust
+			}
+
+		}
+function doKeyDown(e){
+    
+			if (e.keyCode == 32) { //checks for spacebar input press
+				accelerate(-0.4); //reduce thrust
+			}
+
+		}
+</script>
+    <h1>PRESS AND HOLD SPACEBAR TO HOVER</h1> 
+    <h2><b>SPEED LEVEL: <a id="level">0</a></b></h2>
+    <h2><b>SCORE: <a id="score">0</a></b></h2>
+</body>
+
+  <!-- Image Section -->
+  <section id="signup" class="signup-section">
+    <div class="container">
+      <div class="row">
+
+      </div>
+    </div>
+
+  </section>
+
+
+  <!-- Contact Section -->
+  <section class="contact-section bg-black">
+    <div class="container">
+
+      <div class="row">
+
+        <div class="col-md-4 mb-3 mb-md-0">
+          <div class="card py-4 h-100">
+            <div class="card-body text-center">
+              <i class="fas fa-map-marked-alt text-primary mb-2"></i>
+              <h4 class="text-uppercase m-0">Address</h4>
+              <hr class="my-4">
+              <div class="small text-black-50">Bray, Co.Wicklow, Ireland</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 mb-3 mb-md-0">
+          <div class="card py-4 h-100">
+            <div class="card-body text-center">
+              <i class="fas fa-envelope text-primary mb-2"></i>
+              <h4 class="text-uppercase m-0">Email</h4>
+              <hr class="my-4">
+              <div class="small text-black-50">
+                <a href="#">BlairJames23@gmail.com</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 mb-3 mb-md-0">
+          <div class="card py-4 h-100">
+            <div class="card-body text-center">
+              <i class="fas fa-mobile-alt text-primary mb-2"></i>
+              <h4 class="text-uppercase m-0">Phone</h4>
+              <hr class="my-4">
+              <div class="small text-black-50">+353 89 205 4356</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="social d-flex justify-content-center">
+        <a href="https://www.linkedin.com/in/james-blair-024253108/" class="mx-2">
+          <i class="fab fa-linkedin"></i>
+        </a>
+        <a href="https://www.facebook.com/james.blair.10236" class="mx-2">
+          <i class="fab fa-facebook-f"></i>
+        </a>
+        <a href="https://github.com/StreetMackerel" class="mx-2">
+          <i class="fab fa-github"></i>
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-black small text-center text-white-50">
+    <div class="container">
+      Copyright &copy; James Blair 2020
+    </div>
+  </footer>
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Plugin JavaScript -->
+  <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+  <!-- Custom scripts for this template -->
+  <script src="js/grayscale.min.js"></script>
+
+</body>
+
+</html>
