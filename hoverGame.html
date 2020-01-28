@@ -54,7 +54,7 @@ body {
     text-align: center;
     align-content: center;
     background-color: #000000;
-    margin-top: 250px;
+    margin-top: 125px;
 }
 
 
@@ -302,6 +302,26 @@ function doKeyDown(e){
     <h1>PRESS AND HOLD SPACEBAR TO HOVER</h1> 
     <h2><b>SPEED LEVEL: <a id="level">0</a></b></h2>
     <h2><b>SCORE: <a id="score">0</a></b></h2>
+    
+    <section id="about" class="about-section text-left" style = "padding-top: 50px">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg mx-auto">
+          <h2 class="text-white mb-4">Hover Game</h2>
+            
+          <p class="text-white-50">Hover Game was a first look at games programming. My interactions with computer modeling mathematical functions lead me to wanting to implement them as part of an actual game. It's similar functional to a miniclip classic called helicopter game or flappy bird.<br><br> The player can tap the space bar to increase velocity and will bounce off of the walls and floor. Colliding with a pillar is the lose condition. As time increases so does the player's score. Each increment of 10 points increases th player's speed.This is where the most interesting design challenges were introduced as I needed to find a way to increase the spawnrate of the walls while maintatining their density. I needed to create modifiers for the size of gaps, the duration of time between walls and balance this with how quickly they would move as the game progressed. Many iterations lead to some impossible gameplay scenarios!</p>
+              
+        <div class = "col mx-auto" style="margin-bottom: 80px">
+            <img src="img/hoverCode.jpg" class="img-fluid" alt="" style="align-content: center">
+        </div>
+            
+            <p class="text-white-50">The code for this game is running straight out of the webpage as this was the only way I knew how to implement this at the time. This game is simply using the javascript canvas feature to draw all the elements. So you can right click and inspect and open the script tag to check it out.<br><br>What is interesting in retrospect for me with this project is my use of functions to create psuedo objects rather than simply usuing classes. This makes the game seems much more disordered than it could have been. The lack of any actual images or pre built game functions in the pure javascript also lends to this experience of overall disorder however I think this is a great starting point as it allowed me to really appreciate the features of game libraries and engines when I eventually got there.</p>
+        </div>
+     
+        
+           </div>
+    </div>
+  </section>
 </body>
 
   <!-- Image Section -->
