@@ -22,10 +22,10 @@
 </head>
 
 <body id="page-top">
-<container style="margin:  0px;justify-content: center;display: flex;background-color: #000000;
+<container style="margin:  0px; padding: 30px;justify-content: center;display: flex;background-color: #000000;
     background-color: #000000;">
     <div style=" margin:  0px;">
-<iframe src="https://streetmackerel.github.io/TopDownSpaceGame/" name="SpaceGame" width="1920" height="1080" frameborder="0" scrolling="no">   <p>Your browser does not support iframes.</p> ></iframe>
+<iframe src="https://streetmackerel.github.io/Molecules/" name="Molecules" width="1850" height="1000" frameborder="0" scrolling="no">   <p>Your browser does not support iframes.</p> ></iframe>
         </div>
 </container>
   <!-- Navigation -->
@@ -50,10 +50,15 @@
     <div class="container">
       <div class="row">
         <div class="col-lg mx-auto">
-          <h2 class="text-white mb-4">Space Shooter - Arrow Keys to Move</h2>
+          <h2 class="text-white mb-4">Broad Phase Collision Detection</h2>
             
-          <p class="text-white-50">This top down galaga inspired space game has players avoiding obstalces and collecting tokens on top of a scrolling background of layered images. Through the management of health and score, this project helped me get a working comprehension of how to send messages between a numerous scripts and how to centralise this in a GameManager object.</p>
-
+          <p class="text-white-50">An experiment in improving the quality of 2D collision detection using spatial partining and a 3-Dimensional array. This example features 1500 unique objects at once to be checked. This is acheived by only checking molecules against other objects in each cell. Check out the source at streetmackerel.github.io/Molecules to modify the values.</p>
+              
+        <div class = "col mx-auto" style="margin-bottom: 80px">
+            <img src="img/molecules.jpg" class="img-fluid" alt="" style="align-content: center">
+        </div>
+            
+            <p class="text-white-50">Although this method is much more efficient than brute force checking each object against all others each frame, it is still quite imperfect as objects colliding while being centered in different cells do not register. The next step in this process will be to implement a quad tree system which will check neighbouring cells for collisions as well.</p>
         </div>
      
         
