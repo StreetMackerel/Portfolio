@@ -3,7 +3,7 @@ var vertices = [];
 var originalPos = [];
 var spline_size = 700; // size of graphic, can be made to be % of screen in setup
 var weight = 3;
-var numPoints = 0.3; // closer to 0 = more points
+var numPoints = 0.4; // closer to 0 = more points
 var splineWidth = 2; // line thickness
 var lowerSpeed = 0.005; // floor and ceiling of speeds
 var upperSpeed = 0.017
