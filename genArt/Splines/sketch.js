@@ -11,14 +11,18 @@ var alph = 50; // motion blur
 var stickiness = 10; // how slow the points get before they change direction
 var spiciness = 5 // the closer to 1 the spicier
 
+
 function setup() {
   noStroke();
   strokeWeight(0.5); //unused
   width = window.innerWidth;
   height = window.innerHeight;
-  createCanvas(width, height);
+  canvas = createCanvas(width, height);
+  canvas.position(0,0,'fixed');
+  canvas.style('z-index', '-1');
   resetSpline(spline_size);
   smooth();
+  ellipseMode(CENTER);
 }
 
 function resetSpline(size) { // creates points array and records initial positions in separate array
@@ -43,6 +47,10 @@ function windowResized() { // handle window size change
 function draw() {
   background(0, 0, 0, alph);
   drawSplines();
+  noFill();
+  stroke(150,211,207);
+  ellipse(mouseX,mouseY,150,150)
+  noStroke();
 }
 
 function drawSplines() {
@@ -62,42 +70,53 @@ function drawSplines() {
       midpointToCenter[1] / spiciness
     );
 
-    //case for each direction
-    switch(originalPos[i].dir){
-      case 0:
 
-        //add vector to point to move in
-        let innerPoints = p5.Vector.add(
-          createVector(originalPos[i].x, originalPos[i].y),
-          createVector(midpointToCenter.x, midpointToCenter.y)
-        );
+    if(dist(vertices[i].x, vertices[i].y, originalPos[i].x, originalPos[i].y)>150 || dist(vertices[i].x, vertices[i].y, mouseX-width/2, mouseY-height/2)>150){
+      switch(originalPos[i].dir){
+        case 0:
 
-        //lerp in by the object's random speed
-        vertices[i].x = lerp(vertices[i].x, innerPoints.x, originalPos[i].sp);
-        vertices[i].y = lerp(vertices[i].y, innerPoints.y, originalPos[i].sp);
-        //if we reach a certain distance from target, change direction
-        if(dist(vertices[i].x, vertices[i].y, innerPoints.x, innerPoints.y)< stickiness){
-        originalPos[i].dir = 1;
-        }
-        break;
-      case 1:
+          //add vector to point to move in
+          let innerPoints = p5.Vector.add(
+            createVector(originalPos[i].x, originalPos[i].y),
+            createVector(midpointToCenter.x, midpointToCenter.y)
+          );
 
-        //subtract vector to move out
-        let outerPoints = p5.Vector.sub(
-          createVector(originalPos[i].x, originalPos[i].y),
-          createVector(midpointToCenter.x, midpointToCenter.y)
-        );
+          //lerp in by the object's random speed
+          vertices[i].x = lerp(vertices[i].x, innerPoints.x, originalPos[i].sp);
+          vertices[i].y = lerp(vertices[i].y, innerPoints.y, originalPos[i].sp);
+          //if we reach a certain distance from target, change direction
+          if(dist(vertices[i].x, vertices[i].y, innerPoints.x, innerPoints.y)< stickiness){
+          originalPos[i].dir = 1;
+          }
+          break;
+        case 1:
 
-        vertices[i].x = lerp(vertices[i].x, outerPoints.x, originalPos[i].sp);
-        vertices[i].y = lerp(vertices[i].y, outerPoints.y, originalPos[i].sp);
-        if(dist(vertices[i].x, vertices[i].y, outerPoints.x, outerPoints.y) < stickiness){
-          originalPos[i].dir = 0;
-        }
-        break;
+          //subtract vector to move out
+          let outerPoints = p5.Vector.sub(
+            createVector(originalPos[i].x, originalPos[i].y),
+            createVector(midpointToCenter.x, midpointToCenter.y)
+          );
+
+          vertices[i].x = lerp(vertices[i].x, outerPoints.x, originalPos[i].sp);
+          vertices[i].y = lerp(vertices[i].y, outerPoints.y, originalPos[i].sp);
+          if(dist(vertices[i].x, vertices[i].y, outerPoints.x, outerPoints.y) < stickiness){
+            originalPos[i].dir = 0;
+          }
+          break;
+      } 
+    } else {
+      fill(150,211,207);
+      ellipse(vertices[i].x, vertices[i].y, 10,10);
+      vertices[i].x = lerp(vertices[i].x, mouseX-width/2, originalPos[i].sp*1.5);
+      vertices[i].y = lerp(vertices[i].y, mouseY-height/2, originalPos[i].sp*1.5);
+      fill(100,161,157);
     }
 
     //places point
-    curveVertex(vertices[i].x, vertices[i].y);
+    
+      curveVertex(vertices[i].x, vertices[i].y);
+    
+    
   }
 
   //this handles a known p5 bug with closing curve vertex shapes
