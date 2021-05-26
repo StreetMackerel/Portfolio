@@ -3,13 +3,14 @@ var vertices = [];
 var originalPos = [];
 var spline_size = 700; // size of graphic, can be made to be % of screen in setup
 var weight = 3;
-var numPoints = 0.4; // closer to 0 = more points
+var numPoints = .6; // closer to 0 = more points
 var splineWidth = 2; // line thickness
 var lowerSpeed = 0.005; // floor and ceiling of speeds
 var upperSpeed = 0.017
 var alph = 50; // motion blur
 var stickiness = 10; // how slow the points get before they change direction
-var spiciness = 5 // the closer to 1 the spicier
+var spiciness = 4; // the closer to 1 the spicier
+var wanderRange = 90;
 
 
 function setup() {
@@ -49,7 +50,7 @@ function draw() {
   drawSplines();
   noFill();
   stroke(150,211,207);
-  ellipse(mouseX,mouseY,150,150)
+  ellipse(mouseX,mouseY,wanderRange,wanderRange)
   noStroke();
 }
 
@@ -71,7 +72,7 @@ function drawSplines() {
     );
 
 
-    if(dist(vertices[i].x, vertices[i].y, originalPos[i].x, originalPos[i].y)>150 || dist(vertices[i].x, vertices[i].y, mouseX-width/2, mouseY-height/2)>150){
+    if(dist(vertices[i].x, vertices[i].y, originalPos[i].x, originalPos[i].y)>wanderRange || dist(vertices[i].x, vertices[i].y, mouseX-width/2, mouseY-height/2)>wanderRange){
       switch(originalPos[i].dir){
         case 0:
 
@@ -107,8 +108,8 @@ function drawSplines() {
     } else {
       fill(150,211,207);
       ellipse(vertices[i].x, vertices[i].y, 10,10);
-      vertices[i].x = lerp(vertices[i].x, mouseX-width/2, originalPos[i].sp*1.5);
-      vertices[i].y = lerp(vertices[i].y, mouseY-height/2, originalPos[i].sp*1.5);
+      vertices[i].x = lerp(vertices[i].x, mouseX-width/2, originalPos[i].sp*2.5);
+      vertices[i].y = lerp(vertices[i].y, mouseY-height/2, originalPos[i].sp*2.5);
       fill(100,161,157);
     }
 
