@@ -3,19 +3,20 @@ var vertices = [];
 var originalPos = [];
 var spline_size = 700; // size of graphic, can be made to be % of screen in setup
 var weight = 3;
-var numPoints = .6; // closer to 0 = more points
-var splineWidth = 2; // line thickness
+var numPoints = .4; // closer to 0 = more points
+var splineWidth = 1; // line thickness
 var lowerSpeed = 0.005; // floor and ceiling of speeds
-var upperSpeed = 0.017
+var upperSpeed = 0.05
 var alph = 50; // motion blur
 var stickiness = 10; // how slow the points get before they change direction
-var spiciness = 4; // the closer to 1 the spicier
+var spiciness = 7; // the closer to 1 the spicier
 var wanderRange = 90;
-
+var layers = 20;
+var md = false;
 
 function setup() {
   noStroke();
-  strokeWeight(0.5); //unused
+  strokeWeight(0.1); //unused
   width = window.innerWidth;
   height = window.innerHeight;
   canvas = createCanvas(width, height);
@@ -48,14 +49,30 @@ function windowResized() { // handle window size change
 function draw() {
   background(0, 0, 0, alph);
   drawSplines();
-  noFill();
-  stroke(150,211,207);
-  ellipse(mouseX,mouseY,wanderRange,wanderRange)
-  noStroke();
+
+
+  for(var i = 0; i < layers; i++){
+  drawExtraSplines(i);
+  }
+  //noStroke();
+  //noFill();
+  stroke(255);
+  if(md){
+   // ellipse(mouseX,mouseY,wanderRange,wanderRange);
+  }
+}
+
+function mousePressed(){
+  md =true;
+}
+function mouseReleased(){
+  md = false;
+  mouseX = 0;
+  mouseY = 0;
 }
 
 function drawSplines() {
-  fill(100,161,157); //orange
+  fill(0); //orange
   strokeWeight(splineWidth); //unused
   push();
   translate(width / 2, height / 2); // center is 0,0
@@ -106,11 +123,11 @@ function drawSplines() {
           break;
       } 
     } else {
-      fill(150,211,207);
-      ellipse(vertices[i].x, vertices[i].y, 10,10);
+      //fill(150,211,207);
+    //  ellipse(vertices[i].x, vertices[i].y, 10,10);
       vertices[i].x = lerp(vertices[i].x, mouseX-width/2, originalPos[i].sp*2.5);
       vertices[i].y = lerp(vertices[i].y, mouseY-height/2, originalPos[i].sp*2.5);
-      fill(100,161,157);
+      //fill(100,161,157);
     }
 
     //places point
@@ -125,7 +142,45 @@ function drawSplines() {
   curveVertex(vertices[2].x,vertices[2].y);
   endShape();
   
+
   //curveTightness(0); pointyness of peaks
+  pop();
+}
+
+function drawExtraSplines(offset){
+  push();
+  translate(width / 2, height / 2);
+  beginShape();
+
+  let newPoints = [];
+  vertices.forEach(v => {
+
+    let midpointToCenter = midpoint(v.x,v.y, 0, 0);
+    midpointToCenter = createVector(
+      midpointToCenter[0] ,
+      midpointToCenter[1]
+    );
+
+    let newPos = p5.Vector.sub(
+      createVector(v.x,v.y),
+      createVector((midpointToCenter.x/16)*offset,(midpointToCenter.y/16)*offset)
+    );
+
+    if(dist(mouseX-width/2,mouseY-height/2,newPos.x,newPos.y)<150){
+      newPos.x += random(-20,20);
+      newPos.y += random(-20,20);
+    }
+    
+    newPoints.push(newPos)
+  });
+  newPoints.forEach(p => {
+    curveVertex(p.x,p.y);
+  })
+
+  curveVertex(newPoints[1].x,newPoints[1].y);
+  curveVertex(newPoints[2].x,newPoints[2].y);
+
+  endShape();
   pop();
 }
 
